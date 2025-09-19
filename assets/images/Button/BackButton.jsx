@@ -1,6 +1,6 @@
 import React from "react";
 import { Pressable, Text, StyleSheet } from "react-native";
-import { ArrowLeft01Icon } from "hugeicons-react-native";
+import { Ionicons } from "@expo/vector-icons"; // ✅ Expo icon
 import { useRouter } from "expo-router";
 
 export default function BackButton({ label = "Back", color = "black" }) {
@@ -8,7 +8,7 @@ export default function BackButton({ label = "Back", color = "black" }) {
 
   return (
     <Pressable style={styles.backButton} onPress={() => router.back()}>
-      <ArrowLeft01Icon size={28} color={color} />
+      <Ionicons name="arrow-back" size={28} color={color} />
       <Text style={[styles.backText, { color }]}>{label}</Text>
     </Pressable>
   );

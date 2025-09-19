@@ -1,16 +1,32 @@
+import React, { use } from 'react'
+import { View, Text } from 'react-native'
+import { AuthProvider,useAuth } from '../constants/context/AuthContext'
 import { Stack } from 'expo-router'
-import React, { Component } from 'react'
-import { Text, StyleSheet, View } from 'react-native'
 
-export default class _layout extends Component {
-  render() {
-    return (
-   <Stack screenOptions={{
-    headerShown:false
-   }}
-   />
-    )
-  }
+
+
+const _layout = () => {
+  return (  
+    <AuthProvider>
+      <MainLayout />
+    </AuthProvider>
+  )
 }
 
-const styles = StyleSheet.create({})
+const MainLayout = () => {
+  const { user, setAuth, setUserData } = useAuth();
+
+  // useEffect(() => {
+  //   Supabase.auth.onAuthStateChange((_event, session) => {
+  //     console.log('Auth state changed:', session?.user);
+  //   })
+  // });
+
+  return (
+ <Stack
+ screenOptions={{ headerShown: false }}
+ />
+  )
+}
+
+export default _layout

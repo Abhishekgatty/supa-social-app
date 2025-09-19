@@ -1,25 +1,34 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
-import { Home03Icon } from "hugeicons-react-native";
+
 import BackButton from "../assets/images/Button/BackButton";
 import { Alert } from "react-native";
 import { router } from "expo-router";
-
+import { supabase } from "../lib/supabase";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
- const handleLogin = () => {
-  if (!email.trim() || !password.trim()) {
-    Alert.alert("Error", "Please enter both email and password");
-    return;
-  }
+  const handleLogin = async () => {
+    if (!email.trim() || !password.trim()) {
+      Alert.alert("Error", "Please enter both email and password");
+      return;
+    }
 
-  // If valid
-  console.log("Email:", email, "Password:", password);
-  // 👉 Navigate or call API here
-};
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      Alert.alert("Login Failed", error.message);
+    } else {
+      Alert.alert("Success", "Logged in successfully!");
+      console.log("User:", data.user);
+       router.replace("/"); // 👈 navigate to home or dashboard
+    }
+  };
 
   return (
     <View style={styles.container}>

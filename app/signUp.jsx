@@ -1,25 +1,40 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Pressable, StyleSheet } from "react-native";
-import { Home03Icon } from "hugeicons-react-native";
+import { View, Text, TextInput, Pressable, StyleSheet, Alert } from "react-native";
 import BackButton from "../assets/images/Button/BackButton";
-import { Alert } from "react-native";
 import { router } from "expo-router";
+import { supabase } from "../lib/supabase"; // ✅ import supabase client
 
-export default function signUp() {
+export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-    const [name, setName] = useState("");
+  const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
 
- const handleLogin = () => {
-  if (!email.trim() || !password.trim()) {
-    Alert.alert("Error", "Please enter both email and password");
-    return;
-  }
+  const handleSignup = async () => {
+    if (!email.trim() || !password.trim() || !name.trim()) {
+      Alert.alert("Error", "Please enter name, email, and password");
+      return;
+    }
 
-  // If valid
-  console.log("Email:", email, "Password:", password);
-  // 👉 Navigate or call API here
-};
+    setLoading(true);
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { name }, 
+      },
+    });
+
+    setLoading(false);
+
+    if (error) {
+      Alert.alert("Signup Failed", error.message);
+    } else {
+      Alert.alert("Success", "Check your email to confirm your account!");
+      router.push("login"); // ✅ go to login after signup
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -31,8 +46,8 @@ export default function signUp() {
 
       <Text style={styles.title}>Sign up</Text>
 
-
-  <TextInput
+      {/* Name Input */}
+      <TextInput
         style={styles.input}
         placeholder="Enter your name"
         placeholderTextColor="#aaa"
@@ -59,19 +74,17 @@ export default function signUp() {
         onChangeText={setPassword}
       />
 
-   
-
-      {/* Login Button */}
-      <Pressable style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Sign up</Text>
+      {/* Signup Button */}
+      <Pressable style={styles.button} onPress={handleSignup} disabled={loading}>
+        <Text style={styles.buttonText}>{loading ? "Signing up..." : "Sign up"}</Text>
       </Pressable>
 
       <View style={styles.signupContainer}>
-  <Text style={styles.signupText}>Already have an account? </Text>
-  <Pressable onPress={() => router.push("login")}>
-    <Text style={styles.signupLink}>Login</Text>
-  </Pressable>
-</View>
+        <Text style={styles.signupText}>Already have an account? </Text>
+        <Pressable onPress={() => router.push("login")}>
+          <Text style={styles.signupLink}>Login</Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
@@ -113,40 +126,32 @@ const styles = StyleSheet.create({
   },
   header: {
     position: "absolute",
-    top: 80, // distance from top
+    top: 80,
     left: 20,
     marginTop: 10,
   },
   welcome: {
     fontSize: 26,
     fontWeight: "bold",
-    color: "#222", // dark text
+    color: "#222",
   },
   subtitle: {
     fontSize: 16,
-    color: "#666", // lighter gray
+    color: "#666",
     marginTop: 4,
   },
-  forgotText: {
-    color: "#007BFF", // blue link-like color
-    marginTop: 8,
-    marginBottom: 16,
-    textAlign: "right",
-    fontWeight: "500",
-  },
   signupContainer: {
-  flexDirection: 'row',
-  justifyContent: 'center',
-  marginTop: 16,
-},
-signupText: {
-  color: '#555',
-  fontSize: 14,
-},
-signupLink: {
-  color: '#007BFF',  // blue like a link
-  fontWeight: '600',
-  fontSize: 14,
-},
-
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 16,
+  },
+  signupText: {
+    color: "#555",
+    fontSize: 14,
+  },
+  signupLink: {
+    color: "#007BFF",
+    fontWeight: "600",
+    fontSize: 14,
+  },
 });
